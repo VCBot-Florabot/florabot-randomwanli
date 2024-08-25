@@ -1,0 +1,10 @@
+{
+    "PluginName": "随机梨梨",
+    "DependentLibraries": null,
+    "IsLibraries": false,
+    "PluginIcon": null,
+    "PluginAuthor": "luyanci",
+    "MainPyName": "wanli",
+    "PluginDescription": "随机发送@丸梨丸梨 的图片",
+    "EnablePlugin": true
+}
