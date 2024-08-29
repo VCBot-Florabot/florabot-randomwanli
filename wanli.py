@@ -28,11 +28,21 @@ def event(data: dict):  # 事件函数,FloraBot每收到一个事件都会调用
     gid = data.get("group_id")  # 事件对象群号
     mid = data.get("message_id")  # 消息ID
     msg = data.get("raw_message")  # 消息内容
+    try:
+        global ws_client
+        global ws_server
+        send_address = data.get("SendAddress")
+        ws_client = send_address.get("WebSocketClient")
+        ws_server = send_address.get("WebSocketServer")
+    except:
+        ws_server=None
+        ws_client=None
+        pass
     if msg is not None:
         msg = msg.replace("&#91;", "[").replace("&#93;", "]").replace("&amp;", "&").replace("&#44;", ",")  # 消息需要将URL编码替换到正确内容
         #print(uid, gid, mid, msg)
         if msg == "#随机梨梨":
-            send_msg(f'[CQ:at,id={uid}]\n[CQ:image,file={get_random()}]',uid=uid,gid=gid)
+            send_compatible(msg=f'[CQ:at,id={uid}]\n[CQ:image,file={get_random()}]',uid=uid,gid=gid)
 def get_random(type:str=None):
     """
     返回随机图片(默认json文本,可307)
@@ -61,3 +71,12 @@ def image_to_base64(image_path:str):
     with open(image_path, 'rb') as f:
         base64_data = base64.b64encode(f.read())
         return f'base64://{base64_data}'
+    
+    
+def send_compatible(msg:str,uid:str|int,gid: str|int,mid:int|str=None):  #兼容性函数,用于兼容旧版本API(请直接调用本函数)
+    if flora_api.get("FloraVersion") == 'v1.01': #旧版本API
+        send_msg(msg=msg,gid=gid,uid=uid,mid=mid)
+    else:
+        send_type=flora_api.get("ConnectionType")
+        send_address=flora_api.get("FrameworkAddress")
+        send_msg(msg=msg,gid=gid,uid=uid,mid=mid,send_type=send_type,ws_client=ws_client,ws_server=ws_server)
